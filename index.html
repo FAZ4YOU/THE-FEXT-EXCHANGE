@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>THE FECT EXCHANGE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="logo-mark">FX</span>
+      <h1>THE FECT<br>EXCHANGE</h1>
+    </div>
+    <p class="login-sub">LOGIN WITH TELEGRAM</p>
+
+    <div class="field">
+      <label for="tgUsername">Telegram Username</label>
+      <div class="input-prefix">
+        <span>@</span>
+        <input type="text" id="tgUsername" placeholder="username" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="tgId">Telegram ID</label>
+      <input type="text" id="tgId" placeholder="Telegram ID (bukan password)" autocomplete="off">
+    </div>
+
+    <button class="btn btn-primary btn-block" id="loginBtn">LOGIN</button>
+    <p class="login-note">Telegram ID digunakan sebagai identitas akun, bukan password. Versi demo ini menyimpan sesi secara lokal di perangkatmu — belum terhubung ke backend/Telegram Login Widget resmi.</p>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app" class="app hidden">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand" id="brandHome">
+        <span class="brand-mark">FX</span>
+        <span class="brand-text">THE FECT EXCHANGE</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="searchToggle" aria-label="Cari">🔍</button>
+        <button class="icon-btn" id="notifToggle" aria-label="Notifikasi">🔔<span class="badge hidden" id="notifBadge">0</span></button>
+        <button class="icon-btn" id="profileToggle" aria-label="Profil">👤</button>
+      </div>
+    </div>
+    <div class="header-balance">
+      <span class="label">SALDO TABUNGAN</span>
+      <span class="value" id="headerBalance">Rp 0</span>
+    </div>
+
+    <!-- search panel -->
+    <div class="dropdown hidden" id="searchPanel">
+      <input type="text" id="searchInput" placeholder="Cari transaksi, target, catatan, pair...">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <!-- notification panel -->
+    <div class="dropdown hidden" id="notifPanel">
+      <div class="dropdown-title">NOTIFIKASI</div>
+      <div id="notifList" class="notif-list"><p class="empty">Belum ada notifikasi.</p></div>
+    </div>
+
+    <!-- profile panel -->
+    <div class="dropdown hidden" id="profilePanel">
+      <div class="dropdown-title">AKUN</div>
+      <p id="profileUsername" class="profile-username">@username</p>
+      <p id="profileId" class="profile-id">Telegram ID: ••••</p>
+      <button class="btn btn-outline btn-block" id="logoutBtn">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main">
+
+    <!-- ============ HOME ============ -->
+    <section class="page" id="page-home">
+      <div class="balance-card">
+        <span class="label">SALDO</span>
+        <span class="amount" id="homeBalance">Rp 0</span>
+        <div class="pl-row">
+          <span class="pl-label">P/L HARI INI</span>
+          <span class="pl-value" id="homePlToday">Rp 0</span>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box"><span class="stat-label">Income</span><span class="stat-value" id="statIncome">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">Expense</span><span class="stat-value" id="statExpense">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">P/L 7D</span><span class="stat-value" id="statPl7d">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">P/L 30D</span><span class="stat-value" id="statPl30d">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">Transaksi</span><span class="stat-value" id="statTxCount">0</span></div>
+        <div class="stat-box"><span class="stat-label">Portfolio</span><span class="stat-value" id="statPortfolio">Rp 0</span></div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="qa-btn qa-yellow" data-action="open-nabung">+ NABUNG</button>
+        <button class="qa-btn" data-action="open-keluar">- KELUAR</button>
+        <button class="qa-btn" data-action="goto-target">TARGET</button>
+        <button class="qa-btn" data-action="goto-trade">TRADE</button>
+      </div>
+
+      <div class="section-block" id="mainTargetBlock">
+        <div class="section-head"><h2>Target Utama</h2></div>
+        <div id="mainTargetCard"><p class="empty">Belum ada target. Buat di halaman TARGET.</p></div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-head"><h2>Aktivitas Terbaru</h2></div>
+        <div id="recentActivity"><p class="empty">Belum ada transaksi.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ MARKET ============ -->
+    <section class="page hidden" id="page-market">
+      <div class="section-head"><h2>Market</h2><span class="tag-demo">DATA SIMULASI</span></div>
+      <input type="text" id="marketSearch" class="text-input" placeholder="Cari pair...">
+      <div class="market-table" id="marketTable"></div>
+    </section>
+
+    <!-- ============ TRADE ============ -->
+    <section class="page hidden" id="page-trade">
+      <div class="tabs" id="tradeTabs">
+        <button class="tab active" data-tab="panel">TRADE</button>
+        <button class="tab" data-tab="positions">POSISI</button>
+        <button class="tab" data-tab="orders">ORDER</button>
+        <button class="tab" data-tab="history">HISTORI</button>
+        <button class="tab" data-tab="portfolio">PORTFOLIO</button>
+        <button class="tab" data-tab="watchlist">WATCHLIST</button>
+      </div>
+
+      <div class="tab-panel" id="tab-panel">
+        <div class="paper-banner">⚠ PAPER TRADING — SIMULATION ONLY. Tidak menggunakan uang asli.</div>
+
+        <div class="trade-header">
+          <select id="symbolSelect" class="symbol-select"></select>
+          <div class="trade-price">
+            <span id="tradePrice">-</span>
+            <span id="tradeChange" class="change">-</span>
+          </div>
+        </div>
+
+        <div class="timeframes" id="timeframes">
+          <button data-tf="1M" class="tf">1M</button>
+          <button data-tf="5M" class="tf">5M</button>
+          <button data-tf="15M" class="tf">15M</button>
+          <button data-tf="1H" class="tf active">1H</button>
+          <button data-tf="4H" class="tf">4H</button>
+          <button data-tf="1D" class="tf">1D</button>
+        </div>
+        <canvas id="chartCanvas" class="chart-canvas"></canvas>
+
+        <div class="trade-grid">
+          <div class="orderbook" id="orderBook">
+            <div class="ob-head"><span>Harga</span><span>Jumlah</span><span>Total</span></div>
+            <div class="ob-asks" id="obAsks"></div>
+            <div class="ob-mid" id="obMid">-</div>
+            <div class="ob-bids" id="obBids"></div>
+          </div>
+
+          <div class="order-form">
+            <div class="paper-balances">
+              <div><span>Saldo Tersedia</span><b id="paperAvail">Rp 0</b></div>
+              <div><span>Equity</span><b id="paperEquity">Rp 0</b></div>
+            </div>
+            <div class="order-type-toggle">
+              <button class="ot active" data-ot="MARKET">MARKET</button>
+              <button class="ot" data-ot="LIMIT">LIMIT</button>
+            </div>
+            <div class="field" id="limitPriceField" style="display:none">
+              <label>Price</label>
+              <input type="number" id="orderPrice" class="text-input" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Quantity</label>
+              <input type="number" id="orderQty" class="text-input" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Total</label>
+              <input type="text" id="orderTotal" class="text-input" readonly placeholder="Rp 0">
+            </div>
+            <div class="buysell-row">
+              <button class="btn btn-buy" id="buyBtn">BUY</button>
+              <button class="btn btn-sell" id="sellBtn">SELL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-positions">
+        <div id="positionsList"><p class="empty">Belum ada posisi terbuka.</p></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-orders">
+        <div id="ordersList"><p class="empty">Belum ada order terbuka.</p></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-history">
+        <div id="tradeHistoryList"><p class="empty">Belum ada histori trading.</p></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-portfolio">
+        <div class="stat-grid">
+          <div class="stat-box"><span class="stat-label">Total Portfolio</span><span class="stat-value" id="pfTotal">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Saldo Tersedia</span><span class="stat-value" id="pfAvail">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">P/L</span><span class="stat-value" id="pfPl">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">P/L %</span><span class="stat-value" id="pfPlPct">0%</span></div>
+        </div>
+        <canvas id="allocCanvas" class="alloc-canvas"></canvas>
+        <div id="allocLegend" class="alloc-legend"></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-watchlist">
+        <div id="watchlistList"></div>
+      </div>
+    </section>
+
+    <!-- ============ TARGET ============ -->
+    <section class="page hidden" id="page-target">
+      <div class="section-head"><h2>Target Tabungan</h2><button class="btn btn-primary btn-sm" id="addTargetBtn">+ TARGET</button></div>
+      <div id="targetList"><p class="empty">Belum ada target.</p></div>
+
+      <div class="section-head" style="margin-top:20px"><h2>Budget Tracker</h2><button class="btn btn-primary btn-sm" id="editBudgetBtn">ATUR</button></div>
+      <div class="budget-grid" id="budgetGrid"></div>
+    </section>
+
+    <!-- ============ TOOLS ============ -->
+    <section class="page hidden" id="page-tools">
+      <div class="tabs" id="toolsTabs">
+        <button class="tab active" data-tab="calc">KALKULATOR</button>
+        <button class="tab" data-tab="stats">STATISTIK</button>
+        <button class="tab" data-tab="achv">ACHIEVEMENT</button>
+        <button class="tab" data-tab="notes">CATATAN</button>
+        <button class="tab" data-tab="data">DATA</button>
+      </div>
+
+      <div class="tab-panel" id="tools-calc">
+        <div class="calc-card">
+          <h3>Target Savings Calculator</h3>
+          <div class="field"><label>Target Jumlah (Rp)</label><input type="number" class="text-input calc-in" id="c1_target"></div>
+          <div class="field"><label>Jumlah per bulan (Rp)</label><input type="number" class="text-input calc-in" id="c1_permonth"></div>
+          <div class="calc-result" id="c1_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Daily Savings Calculator</h3>
+          <div class="field"><label>Target Jumlah (Rp)</label><input type="number" class="text-input calc-in" id="c2_target"></div>
+          <div class="field"><label>Jumlah Hari</label><input type="number" class="text-input calc-in" id="c2_days"></div>
+          <div class="calc-result" id="c2_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Days To Target Calculator</h3>
+          <div class="field"><label>Sisa Target (Rp)</label><input type="number" class="text-input calc-in" id="c3_remain"></div>
+          <div class="field"><label>Tabungan per hari (Rp)</label><input type="number" class="text-input calc-in" id="c3_perday"></div>
+          <div class="calc-result" id="c3_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Percentage Calculator</h3>
+          <div class="field"><label>Nilai</label><input type="number" class="text-input calc-in" id="c4_value"></div>
+          <div class="field"><label>Dari Total</label><input type="number" class="text-input calc-in" id="c4_total"></div>
+          <div class="calc-result" id="c4_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Budget Calculator</h3>
+          <div class="field"><label>Pemasukan (Rp)</label><input type="number" class="text-input calc-in" id="c5_income"></div>
+          <div class="field"><label>Pengeluaran Tetap (Rp)</label><input type="number" class="text-input calc-in" id="c5_fixed"></div>
+          <div class="calc-result" id="c5_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Portfolio Calculator</h3>
+          <div class="field"><label>Modal Awal (Rp)</label><input type="number" class="text-input calc-in" id="c6_start"></div>
+          <div class="field"><label>Nilai Sekarang (Rp)</label><input type="number" class="text-input calc-in" id="c6_now"></div>
+          <div class="calc-result" id="c6_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Compound Growth Calculator</h3>
+          <div class="field"><label>Modal Awal (Rp)</label><input type="number" class="text-input calc-in" id="c7_principal"></div>
+          <div class="field"><label>Bunga per Tahun (%)</label><input type="number" class="text-input calc-in" id="c7_rate"></div>
+          <div class="field"><label>Jumlah Tahun</label><input type="number" class="text-input calc-in" id="c7_years"></div>
+          <div class="calc-result" id="c7_result">Hasil: -</div>
+        </div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-stats">
+        <div class="filter-row" id="statsFilter">
+          <button class="tab active" data-filter="weekly">MINGGUAN</button>
+          <button class="tab" data-filter="monthly">BULANAN</button>
+          <button class="tab" data-filter="yearly">TAHUNAN</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box"><span class="stat-label">Total Saving</span><span class="stat-value" id="s_totalSaving">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Rata2 Harian</span><span class="stat-value" id="s_avgDaily">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Streak</span><span class="stat-value" id="s_streak">0 hari</span></div>
+          <div class="stat-box"><span class="stat-label">Hari Terbaik</span><span class="stat-value" id="s_bestDay">-</span></div>
+          <div class="stat-box"><span class="stat-label">Total Expense</span><span class="stat-value" id="s_totalExpense">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Expense Terbesar</span><span class="stat-value" id="s_largestExpense">Rp 0</span></div>
+        </div>
+        <canvas id="statsCanvas" class="stats-canvas"></canvas>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-achv">
+        <div class="achv-grid" id="achvGrid"></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-notes">
+        <div class="section-head"><h2>Catatan</h2><button class="btn btn-primary btn-sm" id="addNoteBtn">+ CATATAN</button></div>
+        <input type="text" id="noteSearch" class="text-input" placeholder="Cari catatan...">
+        <div id="notesList"><p class="empty">Belum ada catatan.</p></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-data">
+        <div class="data-actions">
+          <button class="btn btn-outline btn-block" id="exportBtn">EXPORT JSON</button>
+          <label class="btn btn-outline btn-block file-label">IMPORT JSON<input type="file" id="importFile" accept=".json" hidden></label>
+          <button class="btn btn-outline btn-block" id="backupBtn">BACKUP</button>
+          <label class="btn btn-outline btn-block file-label">RESTORE<input type="file" id="restoreFile" accept=".json" hidden></label>
+          <button class="btn btn-danger btn-block" id="resetBtn">RESET DATA</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="home"><span class="nav-ic">⌂</span><span>HOME</span></button>
+    <button class="nav-btn" data-page="market"><span class="nav-ic">☰</span><span>MARKET</span></button>
+    <button class="nav-btn nav-center" data-page="trade"><span class="nav-ic">⇅</span><span>TRADE</span></button>
+    <button class="nav-btn" data-page="target"><span class="nav-ic">◎</span><span>TARGET</span></button>
+    <button class="nav-btn" data-page="tools"><span class="nav-ic">⚙</span><span>TOOLS</span></button>
+  </nav>
+
+</div>
+
+<!-- ===================== MODALS ===================== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div id="toastRoot" class="toast-root"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
