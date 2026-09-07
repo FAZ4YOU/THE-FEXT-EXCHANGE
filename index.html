@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>THE FECT EXCHANGE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app" class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand" id="brandHome">
+        <span class="brand-mark">FX</span>
+        <span class="brand-text">THE FECT EXCHANGE</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="searchToggle" aria-label="Cari">🔍</button>
+        <button class="icon-btn" id="notifToggle" aria-label="Notifikasi">🔔<span class="badge hidden" id="notifBadge">0</span></button>
+        <button class="icon-btn premium-btn" id="premiumToggle" aria-label="Premium">👑</button>
+      </div>
+    </div>
+    <div class="header-balance">
+      <span class="label">SALDO TABUNGAN</span>
+      <span class="value" id="headerBalance">Rp 0</span>
+    </div>
+
+    <div class="dropdown hidden" id="searchPanel">
+      <input type="text" id="searchInput" placeholder="Cari transaksi, target, catatan...">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <div class="dropdown hidden" id="notifPanel">
+      <div class="dropdown-title">NOTIFIKASI</div>
+      <div id="notifList" class="notif-list"><p class="empty">Belum ada notifikasi.</p></div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main">
+
+    <!-- ============ HOME ============ -->
+    <section class="page" id="page-home">
+      <div class="balance-card">
+        <span class="label">SALDO</span>
+        <span class="amount" id="homeBalance">Rp 0</span>
+        <div class="pl-row">
+          <span class="pl-label">P/L HARI INI</span>
+          <span class="pl-value" id="homePlToday">Rp 0</span>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box"><span class="stat-label">Income</span><span class="stat-value" id="statIncome">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">Expense</span><span class="stat-value" id="statExpense">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">P/L 7D</span><span class="stat-value" id="statPl7d">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">P/L 30D</span><span class="stat-value" id="statPl30d">Rp 0</span></div>
+        <div class="stat-box"><span class="stat-label">Transaksi</span><span class="stat-value" id="statTxCount">0</span></div>
+        <div class="stat-box"><span class="stat-label">Target Aktif</span><span class="stat-value" id="statActiveTargets">0</span></div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="qa-btn qa-yellow" data-action="open-nabung">+ NABUNG</button>
+        <button class="qa-btn" data-action="open-keluar">- KELUAR</button>
+        <button class="qa-btn" data-action="goto-target">TARGET</button>
+        <button class="qa-btn" data-action="goto-analisa">ANALISA</button>
+      </div>
+
+      <div class="section-block" id="mainTargetBlock">
+        <div class="section-head"><h2>Target Utama</h2></div>
+        <div id="mainTargetCard"><p class="empty">Belum ada target. Buat di halaman TARGET.</p></div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-head"><h2>Aktivitas Terbaru</h2></div>
+        <div id="recentActivity"><p class="empty">Belum ada transaksi.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ ANALISA ============ -->
+    <section class="page hidden" id="page-analisa">
+      <div class="section-head"><h2>Analisa Pasar</h2><span class="tag-demo">DATA SIMULASI</span></div>
+      <p class="disclaimer">Chart &amp; indikator di halaman ini adalah data simulasi untuk keperluan edukasi. Bukan data pasar real-time dan bukan saran/sinyal investasi. Selalu lakukan riset sendiri.</p>
+
+      <div class="tabs" id="categoryTabs">
+        <button class="tab active" data-cat="crypto">CRYPTO</button>
+        <button class="tab" data-cat="forex">FOREX</button>
+        <button class="tab" data-cat="xauusd">XAUUSD</button>
+        <button class="tab" data-cat="obligasi">OBLIGASI</button>
+      </div>
+
+      <div class="trade-header">
+        <select id="symbolSelect" class="symbol-select"></select>
+        <div class="trade-price">
+          <span id="tradePrice">-</span>
+          <span id="tradeChange" class="change">-</span>
+        </div>
+      </div>
+
+      <div class="timeframes" id="timeframes">
+        <button data-tf="1M" class="tf">1M</button>
+        <button data-tf="5M" class="tf">5M</button>
+        <button data-tf="15M" class="tf">15M</button>
+        <button data-tf="1H" class="tf active">1H</button>
+        <button data-tf="4H" class="tf">4H</button>
+        <button data-tf="1D" class="tf">1D</button>
+      </div>
+      <canvas id="chartCanvas" class="chart-canvas"></canvas>
+
+      <div class="indicator-grid">
+        <div class="stat-box"><span class="stat-label">MA 20</span><span class="stat-value" id="indMA">-</span></div>
+        <div class="stat-box"><span class="stat-label">RSI 14</span><span class="stat-value" id="indRSI">-</span></div>
+        <div class="stat-box"><span class="stat-label">High</span><span class="stat-value" id="indHigh">-</span></div>
+        <div class="stat-box"><span class="stat-label">Low</span><span class="stat-value" id="indLow">-</span></div>
+      </div>
+
+      <button class="btn btn-outline btn-block" id="favBtn">☆ TAMBAH KE FAVORIT</button>
+
+      <div class="section-block">
+        <div class="section-head"><h2>Favorit</h2></div>
+        <div id="favList"><p class="empty">Belum ada favorit.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ TARGET ============ -->
+    <section class="page hidden" id="page-target">
+      <div class="section-head"><h2>Target Tabungan</h2><button class="btn btn-primary btn-sm" id="addTargetBtn">+ TARGET</button></div>
+      <div id="targetList"><p class="empty">Belum ada target.</p></div>
+
+      <div class="section-head" style="margin-top:20px"><h2>Budget Tracker</h2><button class="btn btn-primary btn-sm" id="editBudgetBtn">ATUR</button></div>
+      <div class="budget-grid" id="budgetGrid"></div>
+    </section>
+
+    <!-- ============ LAINNYA ============ -->
+    <section class="page hidden" id="page-lainnya">
+      <div class="tabs" id="toolsTabs">
+        <button class="tab active" data-tab="stats">STATISTIK</button>
+        <button class="tab" data-tab="calc">KALKULATOR</button>
+        <button class="tab" data-tab="achv">ACHIEVEMENT</button>
+        <button class="tab" data-tab="notes">CATATAN</button>
+        <button class="tab" data-tab="data">DATA</button>
+      </div>
+
+      <div class="tab-panel" id="tools-stats">
+        <div class="filter-row" id="statsFilter">
+          <button class="tab active" data-filter="weekly">MINGGUAN</button>
+          <button class="tab" data-filter="monthly">BULANAN</button>
+          <button class="tab" data-filter="yearly">TAHUNAN</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box"><span class="stat-label">Total Saving</span><span class="stat-value" id="s_totalSaving">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Rata2 Harian</span><span class="stat-value" id="s_avgDaily">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Streak</span><span class="stat-value" id="s_streak">0 hari</span></div>
+          <div class="stat-box"><span class="stat-label">Hari Terbaik</span><span class="stat-value" id="s_bestDay">-</span></div>
+          <div class="stat-box"><span class="stat-label">Total Expense</span><span class="stat-value" id="s_totalExpense">Rp 0</span></div>
+          <div class="stat-box"><span class="stat-label">Expense Terbesar</span><span class="stat-value" id="s_largestExpense">Rp 0</span></div>
+        </div>
+        <canvas id="statsCanvas" class="stats-canvas"></canvas>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-calc">
+        <div class="calc-card">
+          <h3>Target Savings Calculator</h3>
+          <div class="field"><label>Target Jumlah (Rp)</label><input type="number" class="text-input calc-in" id="c1_target"></div>
+          <div class="field"><label>Jumlah per bulan (Rp)</label><input type="number" class="text-input calc-in" id="c1_permonth"></div>
+          <div class="calc-result" id="c1_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Daily Savings Calculator</h3>
+          <div class="field"><label>Target Jumlah (Rp)</label><input type="number" class="text-input calc-in" id="c2_target"></div>
+          <div class="field"><label>Jumlah Hari</label><input type="number" class="text-input calc-in" id="c2_days"></div>
+          <div class="calc-result" id="c2_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Days To Target Calculator</h3>
+          <div class="field"><label>Sisa Target (Rp)</label><input type="number" class="text-input calc-in" id="c3_remain"></div>
+          <div class="field"><label>Tabungan per hari (Rp)</label><input type="number" class="text-input calc-in" id="c3_perday"></div>
+          <div class="calc-result" id="c3_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Percentage Calculator</h3>
+          <div class="field"><label>Nilai</label><input type="number" class="text-input calc-in" id="c4_value"></div>
+          <div class="field"><label>Dari Total</label><input type="number" class="text-input calc-in" id="c4_total"></div>
+          <div class="calc-result" id="c4_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Budget Calculator</h3>
+          <div class="field"><label>Pemasukan (Rp)</label><input type="number" class="text-input calc-in" id="c5_income"></div>
+          <div class="field"><label>Pengeluaran Tetap (Rp)</label><input type="number" class="text-input calc-in" id="c5_fixed"></div>
+          <div class="calc-result" id="c5_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Portfolio Calculator</h3>
+          <div class="field"><label>Modal Awal (Rp)</label><input type="number" class="text-input calc-in" id="c6_start"></div>
+          <div class="field"><label>Nilai Sekarang (Rp)</label><input type="number" class="text-input calc-in" id="c6_now"></div>
+          <div class="calc-result" id="c6_result">Hasil: -</div>
+        </div>
+        <div class="calc-card">
+          <h3>Compound Growth Calculator</h3>
+          <div class="field"><label>Modal Awal (Rp)</label><input type="number" class="text-input calc-in" id="c7_principal"></div>
+          <div class="field"><label>Bunga per Tahun (%)</label><input type="number" class="text-input calc-in" id="c7_rate"></div>
+          <div class="field"><label>Jumlah Tahun</label><input type="number" class="text-input calc-in" id="c7_years"></div>
+          <div class="calc-result" id="c7_result">Hasil: -</div>
+        </div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-achv">
+        <div class="achv-grid" id="achvGrid"></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-notes">
+        <div class="section-head"><h2>Catatan</h2><button class="btn btn-primary btn-sm" id="addNoteBtn">+ CATATAN</button></div>
+        <input type="text" id="noteSearch" class="text-input" placeholder="Cari catatan...">
+        <div id="notesList"><p class="empty">Belum ada catatan.</p></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tools-data">
+        <div class="data-actions">
+          <button class="btn btn-outline btn-block" id="exportBtn">EXPORT JSON</button>
+          <label class="btn btn-outline btn-block file-label">IMPORT JSON<input type="file" id="importFile" accept=".json" hidden></label>
+          <button class="btn btn-outline btn-block" id="backupBtn">BACKUP</button>
+          <label class="btn btn-outline btn-block file-label">RESTORE<input type="file" id="restoreFile" accept=".json" hidden></label>
+          <button class="btn btn-danger btn-block" id="resetBtn">RESET DATA</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PREMIUM ============ -->
+    <section class="page hidden" id="page-premium">
+      <button class="btn btn-outline btn-sm" id="premiumBack">← KEMBALI</button>
+      <div class="premium-hero">
+        <span class="premium-crown">👑</span>
+        <h2>THE FECT EXCHANGE PREMIUM</h2>
+        <p>Akses penuh semua fitur, tanpa batas.</p>
+      </div>
+
+      <div class="section-block">
+        <div class="field">
+          <label>Punya kode promo?</label>
+          <div class="input-prefix">
+            <input type="text" id="promoInput" placeholder="MASUKKAN KODE" style="border:none;padding:11px 10px;flex:1;">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary btn-block" id="applyPromoBtn">TERAPKAN</button>
+        </div>
+        <button class="btn-link" id="skipPromoBtn">Lewati, lihat semua fitur →</button>
+        <p id="promoMsg" class="promo-msg"></p>
+      </div>
+
+      <div class="section-block">
+        <div class="section-head"><h2>Semua Fitur Premium</h2></div>
+        <ul class="feature-list">
+          <li>✔ Target &amp; kategori transaksi tanpa batas</li>
+          <li>✔ Statistik &amp; laporan lanjutan</li>
+          <li>✔ Semua kalkulator finansial</li>
+          <li>✔ Backup otomatis &amp; export/import JSON</li>
+          <li>✔ Tema &amp; kustomisasi tambahan</li>
+          <li>✔ Dukungan prioritas</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <div class="section-head"><h2>Ringkasan Pesanan</h2></div>
+        <div class="order-row"><span>Plan</span><span>Lifetime Access</span></div>
+        <div class="order-row"><span>Harga Normal</span><span id="priceNormal">$1.00</span></div>
+        <div class="order-row hidden" id="priceDiscountRow"><span>Diskon (<span id="promoCodeLabel"></span>)</span><span id="priceDiscount">-$0.00</span></div>
+        <div class="order-row order-total"><span>Total</span><span id="priceTotal">$1.00</span></div>
+        <button class="btn btn-primary btn-block" id="payBtn" style="margin-top:12px">BAYAR DENGAN CRYPTO</button>
+        <p class="promo-msg" id="payNote">Pembayaran crypto di versi demo ini belum terhubung ke payment gateway resmi. Untuk versi production, hubungkan ke payment processor pihak ketiga (mis. Coinbase Commerce / NOWPayments) yang mendukung verifikasi transaksi otomatis.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="home"><span class="nav-ic">⌂</span><span>HOME</span></button>
+    <button class="nav-btn" data-page="analisa"><span class="nav-ic">📊</span><span>ANALISA</span></button>
+    <button class="nav-btn nav-center" id="navAdd"><span class="nav-ic">+</span></button>
+    <button class="nav-btn" data-page="target"><span class="nav-ic">◎</span><span>TARGET</span></button>
+    <button class="nav-btn" data-page="lainnya"><span class="nav-ic">⚙</span><span>LAINNYA</span></button>
+  </nav>
+
+</div>
+
+<!-- ===================== WELCOME / PROMO POPUP ===================== -->
+<div class="modal-overlay hidden" id="welcomeOverlay">
+  <div class="modal welcome-modal">
+    <div class="welcome-emoji">🎉</div>
+    <h2>Yey! New User Special</h2>
+    <p class="welcome-desc">As a new user, you get an exclusive <b>34% OFF</b> on The Fect Exchange Premium (Lifetime Access). This offer is available now — tap continue to view your discounted price.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-block" id="welcomeContinueBtn">CONTINUE</button>
+    </div>
+    <button class="btn-link" id="welcomeDismissBtn">Maybe later</button>
+  </div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div id="toastRoot" class="toast-root"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
